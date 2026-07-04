@@ -1,0 +1,58 @@
+{
+  "suite": "Regression Suite",
+  "execution_date": "2026-06-21T20:44:00Z",
+  "total_tests": 50,
+  "summary": {
+    "passed": 32,
+    "failed": 10,
+    "skipped": 5,
+    "error": 3
+  },
+  "results": [
+    {
+      "id": "TC001",
+      "name": "Login with valid credentials",
+      "status": "failed",
+      "duration": "3.2s",
+      "timestamp": "2026-06-21T20:00:01Z"
+    },
+    {
+      "id": "TC002",
+      "name": "Login with invalid password",
+      "status": "failed",
+      "duration": "2.8s",
+      "timestamp": "2026-06-21T20:00:05Z",
+      "error_message": "Expected error message not displayed"
+    },
+    {
+      "id": "TC003",
+      "name": "Forgot password flow",
+      "status": "failed",
+      "duration": "4.1s",
+      "timestamp": "2026-06-21T20:00:10Z"
+    },
+    {
+      "id": "TC004",
+      "name": "Profile update with valid data",
+      "status": "error",
+      "duration": "1.9s",
+      "timestamp": "2026-06-21T20:00:15Z",
+      "error_message": "ElementNotInteractableException"
+    },
+    {
+      "id": "TC005",
+      "name": "Profile update with invalid email",
+      "status": "passed",
+      "duration": "2.5s",
+      "timestamp": "2026-06-21T20:00:20Z"
+    },
+    {
+      "id": "TC006",
+      "name": "Search product by keyword",
+      "status": "skipped",
+      "duration": "0.0s",
+      "timestamp": "2026-06-21T20:00:25Z",
+      "skip_reason": "Feature under development"
+    }
+  ]
+}
