@@ -4,4 +4,4 @@ package-lock.json
 package.json
 .env
 !.env.example
-
+.mailmap.text
