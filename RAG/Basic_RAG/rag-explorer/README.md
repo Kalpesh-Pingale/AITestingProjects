@@ -92,7 +92,6 @@ Open **http://localhost:5173** in your browser.
 > **Note:** You can switch the embedding model to `nomic-ai/nomic-embed-text-v1.5` by setting `EMBEDDING_MODEL` in `backend/.env` (requires ~700MB download on first use).
 
 ## Tech Stack
-
 - **PyMuPDF** – PDF text extraction
 - **LangChain Text Splitters** – Recursive character text chunking (500 chars, 100 overlap)
 - **sentence-transformers** – `all-MiniLM-L6-v2` local embeddings (384-dim)
