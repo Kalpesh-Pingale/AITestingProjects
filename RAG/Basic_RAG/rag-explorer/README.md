@@ -56,7 +56,8 @@ npm install
 
 ```bash
 cd backend
-source venv/bin/activate
+venv\Scripts\Activate.ps1  ### Use this command in powershell.
+source venv/bin/activa
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
