@@ -1,2 +1,0 @@
-# Format: Proper Name <proper@email> Alias Name <alias@email>
-Kalpesh Pingale <kalpesh@example.com> CommandCodeBot <bot@example.com>
