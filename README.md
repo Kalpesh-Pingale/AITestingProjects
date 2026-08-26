@@ -18,6 +18,9 @@ A collection of AI testing and exploration projects.
 ### AI Social Media Content Creation
 `AI_Social_Media_Content_Creation/` — Fill-in-the-blank content templates that turn one idea into a publish-ready pack for every platform. Plan once with the Hook · Story · Offer worksheet, then repurpose it into YouTube, Instagram (Reel / Post / Carousel), Medium, blog, and LinkedIn pieces. Each template carries its own format, voice rules, hook patterns, skeleton, and pre-publish checklist — designed to be pasted into an AI assistant alongside the plan.
 
+### CrewAI — Test Analyst Agent
+`CrewAI/` — A CrewAI agent that plays senior QA engineer: give it a feature or requirement and it produces 5–10 prioritized test cases (functional, negative, security, edge cases), powered by Groq LLM (openai/gpt-oss-120b).
+
 ## Structure
 
 ```
@@ -41,5 +44,9 @@ A collection of AI testing and exploration projects.
 │   ├── 05_Medium_Article_Template.md
 │   ├── 06_Blog_Post_Template.md
 │   └── 07_LinkedIn_Post_Template.md
+├── CrewAI/                          # Test Analyst agent (CrewAI + Groq)
+│   ├── Test_Analyst_Agent.py
+│   ├── requirements.txt
+│   └── README.md
 └── README.md
 ```

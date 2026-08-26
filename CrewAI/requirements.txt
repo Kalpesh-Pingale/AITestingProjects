@@ -1,0 +1,2 @@
+crewai==1.15.17
+python-dotenv==1.2.3

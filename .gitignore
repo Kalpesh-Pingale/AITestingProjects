@@ -5,3 +5,9 @@ package.json
 .env
 !.env.example
 .mailmap.txt
+
+# Python
+.venv
+venv
+__pycache__/
+*.pyc
