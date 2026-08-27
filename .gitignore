@@ -5,6 +5,7 @@ package.json
 .env
 !.env.example
 .mailmap.txt
+.vscode
 
 # Python
 .venv
