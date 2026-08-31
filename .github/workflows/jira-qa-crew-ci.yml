@@ -1,0 +1,46 @@
+name: Jira QA Crew CI
+
+on:
+  push:
+    paths:
+      - "Crew_AI_QA_Pipeline/**"
+      - ".github/workflows/jira-qa-crew-ci.yml"
+  pull_request:
+    paths:
+      - "Crew_AI_QA_Pipeline/**"
+      - ".github/workflows/jira-qa-crew-ci.yml"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: Crew_AI_QA_Pipeline
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov ruff
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Unit and Streamlit tests
+        env:
+          # No live credentials: integration tests stay deselected.
+          DEMO_MODE: "false"
+        run: pytest -q -m "not integration"

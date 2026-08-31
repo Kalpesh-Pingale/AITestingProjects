@@ -1,0 +1,37 @@
+{
+  "key": "VWO-49",
+  "fields": {
+    "summary": "Bulk export of campaign results as CSV",
+    "issuetype": { "name": "Story" },
+    "status": { "name": "To Do" },
+    "priority": { "name": "Medium" },
+    "labels": ["reporting"],
+    "components": [{ "name": "Reporting" }],
+    "subtasks": [],
+    "issuelinks": [],
+    "description": {
+      "type": "doc",
+      "version": 1,
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Analysts want to export the results of several campaigns at once instead of downloading them one by one."
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The export should run in the background and email a download link when it is ready. Exact column set, file size limits and retention period are still being discussed with the reporting team."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

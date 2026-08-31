@@ -1,0 +1,20 @@
+[theme]
+base = "light"
+primaryColor = "#1264d4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f2f6fb"
+textColor = "#0f1c2e"
+font = "sans serif"
+
+[server]
+headless = true
+maxUploadSize = 20
+enableXsrfProtection = true
+# Keep cross-origin access restricted; add trusted origins explicitly if needed.
+enableCORS = true
+
+[browser]
+gatherUsageStats = false
+
+[logger]
+level = "info"

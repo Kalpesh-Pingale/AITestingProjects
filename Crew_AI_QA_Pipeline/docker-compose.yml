@@ -1,0 +1,16 @@
+services:
+  jira-qa-crew:
+    build: .
+    image: jira-qa-crew:1.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      # Secrets come from the host environment or an .env file; none are baked
+      # into the image.
+      APP_ENV: production
+      OUTPUT_DIR: /app/outputs
+    env_file:
+      - .env
+    volumes:
+      - ./outputs:/app/outputs
+    restart: unless-stopped

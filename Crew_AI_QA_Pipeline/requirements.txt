@@ -1,0 +1,11 @@
+# Runtime dependencies for Streamlit Community Cloud and Docker.
+# Versions are pinned to a mutually compatible set verified on Python 3.12.
+crewai>=1.15.17,<2.0.0
+mcp>=1.28.1,<2.0.0
+streamlit>=1.40,<2.0.0
+pandas>=2.2,<4.0.0
+pydantic>=2.10,<3.0.0
+pydantic-settings>=2.6,<3.0.0
+requests>=2.32,<3.0.0
+python-dotenv>=1.0,<2.0.0
+PyYAML>=6.0,<7.0.0

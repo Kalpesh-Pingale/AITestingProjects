@@ -15,6 +15,9 @@ A collection of AI testing and exploration projects.
 ### Python Learning
 `Python_Learning/` — Python fundamentals practice, organized by topic: basics, keywords/identifiers/variables, literals, operators, conditionals & loops, switch/match, functions & scopes, decorators, type conversion, lambda expressions, lists, and tuples.
 
+### Jira QA Crew — AI-Powered QA Artifact Generator
+`Crew_AI_QA_Pipeline/` — A Streamlit app that turns Jira ticket ids into a full QA pack. Four CrewAI agents run sequentially per ticket (Jira Analyst → Test Plan Writer → Test Case Writer → Playwright Coder), each producing a validated Pydantic object. Jira is read through an MCP server with a deterministic fallback to the Jira Cloud REST API. Outputs: requirements analysis, a 12-section test plan, traceable test cases, Playwright TypeScript specs, a traceability matrix, and Markdown/CSV/JSON/TS/ZIP downloads. See `Crew_AI_QA_Pipeline/README.md`.
+
 ### CrewAI — QA Agent Suite
 `CrewAI/` — A set of CrewAI agents for QA workflows, powered by Groq LLM (openai/gpt-oss-120b):
 
@@ -47,6 +50,7 @@ A collection of AI testing and exploration projects.
 │   ├── ex_12_Lambda_Exp/
 │   ├── ex_13_LIST/
 │   └── ex_14_Tuple/
+├── Crew_AI_QA_Pipeline/             # Jira QA Crew (CrewAI + Jira MCP/REST + Streamlit)
 ├── CrewAI/                          # QA agent suite (CrewAI + Groq)
 │   ├── 01_Test_Analyst_Agent.py     # Test-case generator
 │   ├── 02_Requirements_Clarifier_Agent.py  # Jira user-story clarifier (3-agent crew)
