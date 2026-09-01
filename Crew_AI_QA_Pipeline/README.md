@@ -22,7 +22,9 @@ what is written to disk — is deterministic Python.
 - [Repository structure](#repository-structure)
 - [Local installation](#local-installation)
 - [Environment configuration](#environment-configuration)
+  - [Which credential does what](#which-credential-does-what)
 - [Jira MCP setup](#jira-mcp-setup)
+  - [Reusing an MCP server you already run in an IDE](#reusing-an-mcp-server-you-already-run-in-an-ide)
 - [Jira REST fallback setup](#jira-rest-fallback-setup)
 - [Running the app](#running-the-app)
 - [Demo mode](#demo-mode)
@@ -157,7 +159,7 @@ Crew_AI_QA_Pipeline/
 │   │   ├── renderers.py           deterministic md / csv / json
 │   │   └── artifacts.py           safe paths, files, ZIP
 │   └── ui/ state.py components.py results.py
-├── tests/                         188 tests (4 opt-in integration)
+├── tests/                         190 tests (4 opt-in integration)
 ├── fixtures/jira/                 demo tickets
 ├── outputs/                       generated runs (git-ignored)
 ├── requirements.txt pyproject.toml Dockerfile docker-compose.yml
@@ -218,6 +220,22 @@ LLM_API_KEY=gsk_...
 Configuration is validated before a run starts; problems are reported as
 actionable messages in the UI, never as a stack trace.
 
+### Which credential does what
+
+There are three independent credentials, and they are not interchangeable:
+
+| Credential | Variables | Used by | Not used by |
+| --- | --- | --- | --- |
+| LLM provider key | `LLM_API_KEY` (+ `LLM_BASE_URL`) | every agent stage | Jira, MCP |
+| Jira API token | `JIRA_EMAIL` + `JIRA_API_TOKEN`, or `JIRA_BEARER_TOKEN` | the **REST** provider only ([rest_provider.py:97](src/jira_qa_crew/jira/rest_provider.py#L97)) | MCP |
+| MCP server auth | `JIRA_MCP_HEADERS_JSON` (http/sse) or `JIRA_MCP_ENV_JSON` (stdio) | the **MCP** provider only ([mcp_provider.py:173-192](src/jira_qa_crew/jira/mcp_provider.py#L173-L192)) | REST |
+
+The common misconception is that `JIRA_API_TOKEN` is what MCP authenticates
+with. It is not — the app never forwards it to an MCP server. MCP gets exactly
+the headers or child-process environment you configure, and nothing else. If
+you want an MCP server to use your Jira API token, you have to put it there
+yourself (see below).
+
 ---
 
 ## Jira MCP setup
@@ -227,21 +245,69 @@ disagree about tool names and argument schemas.
 
 ```dotenv
 JIRA_MCP_TRANSPORT=streamable_http          # or sse, or stdio
-JIRA_MCP_URL=https://mcp.atlassian.com/v1/sse
-JIRA_MCP_HEADERS_JSON={"Authorization":"Bearer <token>"}
+JIRA_MCP_URL=https://your-mcp-host/mcp
+JIRA_MCP_HEADERS_JSON={"Authorization":"<whatever your MCP server expects>"}
 JIRA_MCP_GET_ISSUE_TOOL=                    # empty = auto-discover
 JIRA_MCP_ISSUE_KEY_ARG=issueIdOrKey
 JIRA_MCP_TIMEOUT_SECONDS=20
 ```
 
-For a local stdio server:
+The `Authorization` value is passed through verbatim — usually `Bearer <token>`
+for a token-based server, or `Basic <base64 of email:token>` for Atlassian's
+hosted server with an API token.
+
+For a local stdio server, the token goes into the child process's environment,
+using whatever variable names *that server* documents:
 
 ```dotenv
 JIRA_MCP_TRANSPORT=stdio
 JIRA_MCP_COMMAND=npx
 JIRA_MCP_ARGS_JSON=["-y","@your-org/jira-mcp-server"]
-JIRA_MCP_ENV_JSON={"JIRA_API_TOKEN":"..."}
+JIRA_MCP_ENV_JSON={"JIRA_URL":"https://your-domain.atlassian.net","JIRA_EMAIL":"you@example.com","JIRA_API_TOKEN":"ATATT..."}
 ```
+
+### Reusing an MCP server you already run in an IDE
+
+IDE MCP clients (VS Code's `mcp.json`, Claude Desktop, Cursor) keep their own
+server list. This app does not read those files — it has no access to them and
+they use a different schema — but the settings map across directly:
+
+| IDE `mcp.json` | This app |
+| --- | --- |
+| `"type": "http"` + `"url"` | `JIRA_MCP_TRANSPORT=streamable_http` + `JIRA_MCP_URL` |
+| `"type": "sse"` + `"url"` | `JIRA_MCP_TRANSPORT=sse` + `JIRA_MCP_URL` |
+| `"command"` + `"args"` | `JIRA_MCP_TRANSPORT=stdio`, `JIRA_MCP_COMMAND`, `JIRA_MCP_ARGS_JSON` |
+| `"env": { … }` | `JIRA_MCP_ENV_JSON={ … }` |
+| an auth header | `JIRA_MCP_HEADERS_JSON={"Authorization":"…"}` |
+
+Auth is the part that does not always transfer. IDE clients often implement
+auth *modes* — an interactive OAuth flow, or an `apiToken` mode that builds the
+header for you — and store the resulting token in the OS keychain rather than
+in the JSON file. This app takes no auth modes: it sends the literal headers
+you give it. So an IDE entry such as
+
+```jsonc
+{ "url": "https://mcp.atlassian.com/v1/mcp", "type": "http",
+  "auth": { "method": "apiToken", "email": "you@example.com", "token": "ATATT..." } }
+```
+
+becomes an explicit Basic header here:
+
+```dotenv
+JIRA_MCP_TRANSPORT=streamable_http
+JIRA_MCP_URL=https://mcp.atlassian.com/v1/mcp
+JIRA_MCP_HEADERS_JSON={"Authorization":"Basic <base64 of email:token>"}
+```
+
+Generate the value without pasting the secret into a shell history file:
+
+```bash
+python -c "import base64,getpass;e=input('email: ');t=getpass.getpass('token: ');print('Basic '+base64.b64encode(f'{e}:{t}'.encode()).decode())"
+```
+
+If the server rejects that, it wants OAuth rather than an API token. There is
+no way to reuse an IDE's interactive OAuth session from here — run in
+`REST only` mode instead, which needs no MCP server at all.
 
 Behaviour:
 
@@ -333,7 +399,7 @@ escape the run directory. ZIPs are built on demand and refused above 40 MB.
 ## Tests
 
 ```bash
-pytest                      # 184 tests, integration deselected
+pytest                      # 186 tests, integration deselected
 pytest -m integration       # opt-in, needs real credentials
 ruff check .
 ```
@@ -369,9 +435,11 @@ Node.js is unavailable).
 | `Could not initialise the LLM '<model>'` | CrewAI does not route that id natively — `pip install litellm`, or use a natively supported model id. |
 | MCP: "Could not identify a read-only 'get issue' tool" | The server names its tool something unexpected. Set `JIRA_MCP_GET_ISSUE_TOOL` (the error lists the read-only tools it saw). |
 | MCP: "Configured MCP tool … looks like a write tool" | The app refuses write-shaped tools by design. Point it at a read tool. |
+| MCP returns 401/403, or "exposed no tools" | `JIRA_MCP_HEADERS_JSON` is missing, malformed or holds the wrong auth scheme. `JIRA_API_TOKEN` is **not** forwarded to MCP — see [Which credential does what](#which-credential-does-what). |
 | Every ticket falls back to REST | Expected when MCP is unconfigured or failing; the Run Details tab shows the attempt trail and the reason. |
 | `Jira REST rejected the credentials (HTTP 401/403)` | Wrong email/token pair, or the account cannot browse the project. |
 | Acceptance criteria come out empty | The custom field was not detected — set `JIRA_ACCEPTANCE_CRITERIA_FIELD` to the field id. |
+| `Configuration error — Invalid configuration value: <VAR>` on startup | A malformed value in `.env` (for example `LLM_MAX_TOKENS=0c` instead of `0`). The message names the variable; the app refuses to start until it is fixed. |
 | Stage fails with "could not be parsed into a valid … object" | The model failed the schema twice (original + one repair). Use a stronger model or lower the ticket size. |
 | Ticket times out | Raise `PIPELINE_TICKET_TIMEOUT_SECONDS`. |
 | Node.js unavailable | `npx playwright test --list` cannot run; the generated TypeScript structure is still validated in Python (imports, `test()`, locators, forbidden patterns), but compilation is unverified. |

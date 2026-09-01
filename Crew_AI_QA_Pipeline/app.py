@@ -16,7 +16,7 @@ if str(SRC) not in sys.path:  # pragma: no cover - import bootstrap
 import streamlit as st  # noqa: E402
 
 from jira_qa_crew.config import get_settings, load_environment  # noqa: E402
-from jira_qa_crew.exceptions import JiraQACrewError  # noqa: E402
+from jira_qa_crew.exceptions import ConfigurationError, JiraQACrewError  # noqa: E402
 from jira_qa_crew.logging_utils import configure_logging, redact  # noqa: E402
 from jira_qa_crew.models import STAGE_DEFINITIONS, StageStatus  # noqa: E402
 from jira_qa_crew.services.pipeline import QAPipeline  # noqa: E402
@@ -88,7 +88,18 @@ def main() -> None:
     """Render one pass of the application."""
     _configure_page()
     load_environment()
-    settings = get_settings()
+
+    try:
+        settings = get_settings()
+    except ConfigurationError as exc:
+        render_header()
+        st.error(f"Configuration error — {exc}")
+        st.caption(
+            "The app cannot start until this is fixed. Check the named variable "
+            "in your .env file or Streamlit secrets."
+        )
+        st.stop()
+
     configure_logging(settings.log_level)
     init_state()
 

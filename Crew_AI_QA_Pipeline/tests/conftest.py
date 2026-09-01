@@ -50,10 +50,19 @@ _MANAGED_ENV = (
 
 
 @pytest.fixture(autouse=True)
-def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Remove real credentials and reset the settings cache for every test."""
+def clean_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Isolate every test from the developer's real configuration.
+
+    Two things leak otherwise: credentials already exported in the shell, and
+    the project's own ``.env``, which ``load_environment()`` reads on every
+    ``get_settings()`` call. Pointing the loader at a non-existent file keeps
+    a local run identical to CI, where no ``.env`` exists.
+    """
     for key in _MANAGED_ENV:
         monkeypatch.delenv(key, raising=False)
+    monkeypatch.setattr(
+        "jira_qa_crew.config.DEFAULT_ENV_FILE", tmp_path / "absent.env"
+    )
     reset_settings_cache()
     yield
     reset_settings_cache()

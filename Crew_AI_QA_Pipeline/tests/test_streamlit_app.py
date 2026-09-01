@@ -119,3 +119,38 @@ def test_missing_configuration_blocks_the_run(monkeypatch: pytest.MonkeyPatch, t
     assert not at.exception
     assert any("Configuration is incomplete" in element.value for element in at.error)
     assert at.session_state[KEY_RUN] is None
+
+
+def test_malformed_env_value_shows_an_actionable_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A typo in .env must name the variable, not raise a raw traceback."""
+    monkeypatch.setenv("OUTPUT_DIR", str(tmp_path / "outputs"))
+    monkeypatch.setenv("LLM_MAX_TOKENS", "0c")
+
+    at = AppTest.from_file(APP_FILE, default_timeout=TIMEOUT)
+    at.run()
+
+    assert not at.exception
+    errors = " ".join(element.value for element in at.error)
+    assert "Configuration error" in errors
+    assert "LLM_MAX_TOKENS" in errors
+
+
+def test_secret_values_are_not_echoed_in_configuration_errors(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from pydantic import ValidationError
+
+    from jira_qa_crew.config import AppSettings, _describe_settings_error
+
+    try:
+        AppSettings(LLM_MAX_TOKENS="0c", LLM_TEMPERATURE="abc")
+    except ValidationError as exc:
+        message = _describe_settings_error(exc)
+    else:  # pragma: no cover - the construction above always fails
+        raise AssertionError("expected a ValidationError")
+
+    assert "LLM_MAX_TOKENS" in message
+    assert "'0c'" in message
+    assert "LLM_TEMPERATURE" in message

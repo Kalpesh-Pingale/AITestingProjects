@@ -19,7 +19,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field, field_validator
+from pydantic import Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from jira_qa_crew.exceptions import ConfigurationError
@@ -351,11 +351,39 @@ class AppSettings(BaseSettings):
         return problems
 
 
+def _describe_settings_error(exc: ValidationError) -> str:
+    """Turn a pydantic ValidationError into a message naming the bad variable.
+
+    The offending value is echoed only for variables that cannot hold a
+    secret, so a malformed token never reaches the UI or the logs.
+    """
+    problems: list[str] = []
+    for error in exc.errors():
+        location = error.get("loc") or ("configuration",)
+        name = str(location[0]).upper()
+        detail = error.get("msg", "invalid value")
+        if name in SECRET_ENV_KEYS:
+            problems.append(f"{name}: {detail}")
+        else:
+            problems.append(f"{name}: {detail} (got {error.get('input')!r})")
+    return "; ".join(problems)
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> AppSettings:
-    """Return the process wide settings singleton."""
+    """Return the process wide settings singleton.
+
+    A malformed value in ``.env`` or ``st.secrets`` is reported as a typed
+    :class:`ConfigurationError` naming the variable, never as a raw traceback.
+    """
     load_environment()
-    return AppSettings()
+    try:
+        return AppSettings()
+    except ValidationError as exc:
+        raise ConfigurationError(
+            f"Invalid configuration value: {_describe_settings_error(exc)}",
+            remediation="Correct the entry in your .env file or Streamlit secrets.",
+        ) from exc
 
 
 def reset_settings_cache() -> None:
