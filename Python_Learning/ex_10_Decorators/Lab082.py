@@ -1,5 +1,4 @@
 import time
-
 def print_logs(func):
     def wrapper():
         print("Start the logs")

@@ -10,11 +10,9 @@ def decorator2(func):
         func()
     return wrapper
 
-
 @decorator1
 @decorator2
 def say_hello():
     print("Hello!")
-
 
 say_hello()
