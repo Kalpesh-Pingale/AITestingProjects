@@ -1,7 +1,7 @@
 my_list = [1, 2, 3]
 
-my_list[0] = "Pramod"
-my_list[1] = "Dutta"
+my_list[0] = "Kalpesh"
+my_list[1] = "Pingale"
 
 print(my_list)
 # It will overwrite because a list is mutable. 

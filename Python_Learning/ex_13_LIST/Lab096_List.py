@@ -3,7 +3,7 @@
 # 10th marks - 90,91,92, 78, 56
 
 my_list = [1, 2, 3]  # Same type of data (int)
-my_list2 = [1, True, "Pramod", 12.34]
+my_list2 = [1, True, "Kalpesh", 12.34]
 
 print(my_list)
 print(type(my_list)) # <class 'list'> , []

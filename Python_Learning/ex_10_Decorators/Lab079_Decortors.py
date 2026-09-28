@@ -11,4 +11,4 @@ def drive_ola_scooter():
 
 @add_security
 def drive_zypp_scooter():
-    print("Driving Zypp scooter")
+    print("Driving Zypp scooter") 
