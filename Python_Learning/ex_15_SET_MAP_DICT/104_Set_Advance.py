@@ -6,6 +6,6 @@ for i in set1:
     print(i)
 
 
-set1.add("Pramod")
-set1.add("Pramod")
+set1.add("Kalpesh")
+set1.add("Kalpesh")
 print(set1)
