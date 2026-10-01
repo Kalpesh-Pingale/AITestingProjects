@@ -1,9 +1,9 @@
 age = 35
 age = "Kalpesh"
 # Dynamic Typed Language. - It can understand you are doing, want.
-print(age)
+print("Print 1 :",age)
 
 pi = 3.14
 name = "Kalpesh"
-print(name)
+print("Print 2 :",name)
 print(pi)

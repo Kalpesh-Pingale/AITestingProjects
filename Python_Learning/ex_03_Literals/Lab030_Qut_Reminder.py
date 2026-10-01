@@ -15,3 +15,6 @@ reminder= no1%no2
 
 print(quotient)
 print(reminder)
+
+# Dividend will print float 
+print(no1/no2) 
