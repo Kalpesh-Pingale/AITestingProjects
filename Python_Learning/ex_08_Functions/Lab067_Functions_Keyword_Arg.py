@@ -1,6 +1,6 @@
 def display_information(name, role):
     print(f"Name is : {name}, role is : {role}")
-    # print("name :", name, "& role :", role)
+    print("name :", name, "& role :", role)
 
 
 

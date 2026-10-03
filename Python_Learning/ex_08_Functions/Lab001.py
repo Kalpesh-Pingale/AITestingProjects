@@ -1,6 +1,6 @@
 
 # greet_rashmi()
 def greet_rashmi():
-    print("Hi,Rashmi")
+    print("Hello, Rashmi")
     
 greet_rashmi()   
