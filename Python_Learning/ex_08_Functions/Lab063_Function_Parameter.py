@@ -7,4 +7,4 @@ def funwithPara(name):
 
 funwithPara("Kalpesh")  
 funwithPara("Jagruti")
-funwithPara(123)  
+funwithPara(123) 
